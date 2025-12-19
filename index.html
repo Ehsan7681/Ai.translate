@@ -2,324 +2,326 @@
 <html id="htmlTag" lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- PWA Basic Meta -->
+    <!-- PWA & Mobile Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Smart Translator">
     <meta name="theme-color" content="#FDFBF7">
-    
-    <!-- Icon Reference (Assuming icon.png exists in the same folder) -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <title>Smart Translator | Ehsan Shamsi</title>
+    <title>Elite Translator | Ehsan Shamsi</title>
     
+    <!-- Tailwind & Vazirmatn Font -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     
     <style>
         :root {
-            --bg-cream: #FDFBF7;
-            --primary-teal: #006D77;
-            --accent-coral: #FF8360;
-            --text-dark: #2D3142;
-            --card-bg: #FFFFFF;
+            --bg: #FDFBF7;
+            --surface: #FFFFFF;
+            --primary: #006D77;
+            --accent: #FF8360;
+            --text-main: #2D3142;
+            --text-muted: #94A3B8;
         }
 
         .dark {
-            --bg-cream: #121418;
-            --primary-teal: #26A69A;
-            --accent-coral: #FF8A65;
-            --text-dark: #E0E0E0;
-            --card-bg: #1E2128;
+            --bg: #0E1012;
+            --surface: #171A1E;
+            --primary: #26A69A;
+            --accent: #FF8A65;
+            --text-main: #F1F5F9;
+            --text-muted: #64748B;
         }
 
         body {
-            font-family: 'Inter', 'Tahoma', sans-serif;
-            background-color: var(--bg-cream);
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
             overflow-x: hidden;
-            /* Disable Zoom and Selection on UI elements */
             touch-action: manipulation;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .fintech-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+        /* --- Global Reset for UI Cleanliness --- */
+        *:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .glass-card {
+            background: var(--surface);
+            border-radius: 28px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.03);
             border: 1px solid rgba(0, 109, 119, 0.05);
-            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .dark .glass-card {
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-teal { background-color: var(--primary-teal); color: white; }
-        .btn-coral { background-color: var(--accent-coral); color: white; }
-        
-        .input-field {
-            background-color: rgba(0,0,0,0.02);
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            color: var(--text-dark);
+        .btn-press { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-press:active { transform: scale(0.92); }
+
+        .input-area {
+            background: transparent;
+            border: none;
+            resize: none;
+            width: 100%;
+            font-weight: 500;
+            color: var(--text-main);
             user-select: text;
-        }
-        .dark .input-field { background-color: rgba(255,255,255,0.03); }
-        .input-field:focus {
-            border-color: var(--primary-teal);
-            background-color: var(--card-bg);
-            outline: none;
+            outline: none !important;
         }
 
+        /* Directional Smart Arrow */
+        .arrow-indicator {
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+        [dir="ltr"] #dir-arrow { transform: rotate(180deg); }
+
+        /* Unified Compact Modal */
+        .modal-container {
+            display: none;
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: var(--surface);
+            max-width: 420px; width: 100%;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 82vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        @keyframes popIn { 
+            from { opacity: 0; transform: scale(0.95) translateY(15px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+
+        /* --- Dark Mode Input & Select Visibility Fix --- */
+        select, input {
+            color: var(--text-main);
+            background-color: rgba(0,0,0,0.03);
+            border: none !important;
+            outline: none !important;
+        }
+        .dark select, .dark input {
+            background-color: rgba(255,255,255,0.05) !important;
+            color: #F1F5F9 !important;
+        }
+        /* Specifically remove any background/border from the target select in the main bar */
+        #targetLang {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 0px; }
         textarea, p { user-select: text !important; }
 
         .loader {
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
+            width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
-
-        .lang-divider {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0, 109, 119, 0.1);
-        }
-
-        /* Webkit specific to hide scrollbars */
-        .custom-scrollbar::-webkit-scrollbar { width: 0px; background: transparent; }
+        select { appearance: none; background: transparent; text-align-last: center; }
     </style>
 </head>
-<body class="p-4 sm:p-6 lg:p-8 min-h-screen pb-20">
+<body class="min-h-screen flex flex-col items-center">
 
-    <div class="max-w-2xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col items-center mb-8 animate-fade">
-            <div class="flex justify-between items-center w-full mb-4">
-                <div class="flex flex-col">
-                    <h1 class="text-2xl font-extrabold tracking-tight">
-                        <span class="text-[#006D77] dark:text-[#26A69A]" id="ui-title-p1">مترجم</span>
-                        <span class="text-[#FF8360]" id="ui-title-p2">هوشمند</span>
-                    </h1>
-                    <span id="ui-author" class="text-[10px] text-gray-400 font-medium opacity-80">ساخته شده توسط احسان شمسی</span>
-                </div>
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <button onclick="toggleTheme()" class="p-2 fintech-card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <svg id="theme-icon" class="h-5 w-5 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                    </button>
-                    <button onclick="toggleHistory()" class="p-2 fintech-card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <svg class="h-5 w-5 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </button>
-                    <button onclick="toggleUILanguage()" class="p-2 fintech-card hover:bg-gray-50 text-xs font-bold text-[#006D77] dark:text-[#26A69A] px-3">
-                        <span id="ui-lang-btn">EN</span>
-                    </button>
-                    <button onclick="toggleSettings()" class="p-2 fintech-card hover:scale-105 transition-transform relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        <span id="keyBadge" class="absolute -top-1 -right-1 bg-[#FF8360] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
-                    </button>
-                </div>
+    <!-- Header: Ehsan Shamsi Signature -->
+    <header class="w-full max-w-lg flex justify-between items-center mt-10 mb-10 px-6">
+        <div class="flex flex-col">
+            <h1 class="text-base font-black tracking-tight leading-none">
+                <span class="text-[#006D77] dark:text-[#26A69A]">مترجم</span>
+                <span class="text-[#FF8360]">هوشمند</span>
+            </h1>
+            <p class="text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] mt-1">Ehsan Shamsi Signature</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="toggleTheme()" class="h-10 w-10 glass-card flex items-center justify-center btn-press">
+                <svg id="theme-icon" class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"></svg>
+            </button>
+            <button onclick="openModal('history')" class="h-10 w-10 glass-card flex items-center justify-center btn-press text-slate-500">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </button>
+            <button onclick="toggleUILanguage()" class="h-10 px-3 glass-card flex items-center justify-center text-[9px] font-black text-[#006D77] dark:text-[#26A69A] btn-press">
+                <span id="ui-lang-btn">EN</span>
+            </button>
+            <button onclick="openModal('settings')" class="h-10 w-10 bg-[#006D77] dark:bg-[#26A69A] rounded-[14px] flex items-center justify-center text-white shadow-lg btn-press relative">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                <span id="keyBadge" class="absolute -top-1 -right-1 bg-[#FF8360] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold border border-white dark:border-[#0E1012]">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-lg space-y-6 px-6">
+        
+        <!-- Seamless & No-Border Language Bar -->
+        <div class="glass-card p-4 flex items-center justify-between border-none">
+            <div id="ui-auto" class="flex-1 text-center text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">تشخیص خودکار</div>
+            
+            <div class="arrow-indicator">
+                <svg id="dir-arrow" class="w-5 h-5 transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
             </div>
-        </header>
 
-        <!-- Modals -->
-        <div id="settingsOverlay" onclick="handleOverlayClick(event, 'settingsOverlay')" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="fintech-card w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-fade">
-                <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center">
-                    <h2 id="ui-settings-title" class="text-xl font-bold text-[#006D77] dark:text-[#26A69A]">تنظیمات</h2>
-                    <button onclick="toggleSettings()" class="text-gray-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                </div>
-                <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1">
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center text-sm font-bold text-gray-500"><label id="ui-keys-label">کلیدهای API</label><button onclick="addNewKeyField()" class="btn-teal px-3 py-1 rounded-full text-[10px]">+ جدید</button></div>
-                        <div id="apiKeysList" class="space-y-3"></div>
-                    </div>
-                    <div class="space-y-4 pt-4 border-t dark:border-gray-800">
-                        <label id="ui-tone-label" class="text-sm font-bold text-gray-500">لحن ترجمه</label>
-                        <select id="toneSelector" class="w-full p-3 input-field rounded-xl text-sm font-medium"></select>
-                    </div>
-                    <div class="space-y-4 pt-4 border-t dark:border-gray-800">
-                        <label id="ui-model-label" class="text-sm font-bold text-gray-500">مدل هوش مصنوعی</label>
-                        <select id="modelSelector" class="w-full p-3 input-field rounded-xl text-sm font-medium"></select>
-                        <button onclick="fetchAvailableModels()" class="w-full py-2 btn-coral rounded-xl text-[10px] font-bold uppercase">بروزرسانی مدل‌ها</button>
-                    </div>
-                </div>
-                <div class="p-6 border-t dark:border-gray-800 bg-gray-50/20"><button onclick="saveAllSettings()" id="ui-save-btn" class="w-full py-4 btn-teal rounded-2xl font-bold">ذخیره نهایی</button></div>
+            <div class="flex-1 flex justify-center">
+                <select id="targetLang" class="font-black text-xs text-[#006D77] dark:text-[#26A69A] w-full text-center outline-none cursor-pointer border-none bg-transparent"></select>
             </div>
         </div>
 
-        <div id="historyOverlay" onclick="handleOverlayClick(event, 'historyOverlay')" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-            <div class="fintech-card w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-fade">
-                <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center">
-                    <h2 id="ui-history-title" class="text-xl font-bold text-[#006D77] dark:text-[#26A69A]">تاریخچه</h2>
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <button onclick="confirmClearHistory()" class="p-2 text-red-400 hover:bg-red-50 rounded-lg"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                        <button onclick="toggleHistory()" class="text-gray-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                    </div>
-                </div>
-                <div class="p-4 bg-gray-50/30 dark:bg-gray-900/10"><input type="text" id="historySearch" oninput="renderHistory()" placeholder="جستجو..." class="w-full p-3 input-field rounded-xl text-sm"></div>
-                <div id="historyList" class="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1"></div>
-            </div>
-        </div>
-
-        <!-- Confirm Dialog -->
-        <div id="confirmOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-6">
-            <div class="fintech-card w-full max-w-sm p-8 space-y-6 animate-fade text-center">
-                <h3 class="text-xl font-bold mb-2 dark:text-white" id="confirm-q">آیا مطمئن هستید؟</h3>
-                <p class="text-sm text-gray-400" id="confirm-m">این عمل قابل بازگشت نیست.</p>
-                <div class="flex space-x-3 space-x-reverse">
-                    <button onclick="resolveConfirm(false)" class="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 font-bold">خیر</button>
-                    <button onclick="resolveConfirm(true)" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold">بله</button>
+        <!-- Input Section -->
+        <div class="glass-card p-6 md:p-8 space-y-6">
+            <textarea id="sourceText" class="input-area min-h-[190px] text-lg leading-relaxed font-medium" placeholder="متن خود را اینجا بنویسید..."></textarea>
+            
+            <div class="flex justify-between items-center border-t border-slate-50 dark:border-white/5 pt-5">
+                <div id="charCount" class="text-[9px] font-black text-slate-300 dark:text-slate-700 tracking-widest uppercase">0 CHARS</div>
+                <div class="flex gap-2">
+                    <button onclick="pasteText()" class="p-2 text-slate-400 hover:text-[#006D77] transition-all"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg></button>
+                    <button onclick="clearInput()" class="p-2 text-slate-400 hover:text-red-400 transition-all"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Body -->
-        <main class="space-y-6 animate-fade">
-            <div class="fintech-card p-4 flex items-center justify-between">
-                <div id="ui-auto" class="flex-1 text-center font-bold text-gray-400 text-sm">تشخیص خودکار</div>
-                <div class="px-4">
-                    <div class="lang-divider">
-                        <svg id="dir-arrow" class="h-5 w-5 text-[#FF8360] transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                        </svg>
-                    </div>
-                </div>
-                <select id="targetLang" class="flex-1 bg-transparent text-center font-bold text-[#006D77] dark:text-[#26A69A] outline-none border-none cursor-pointer">
-                    <option value="Persian">فارسی</option><option value="English">انگلیسی</option><option value="Arabic">عربی</option>
-                    <option value="German">آلمانی</option><option value="French">فرانسوی</option><option value="Spanish">اسپانیایی</option>
-                    <option value="Turkish">ترکی</option><option value="Italian">ایتالیایی</option><option value="Russian">روسی</option>
-                </select>
-            </div>
+        <!-- Translate Action -->
+        <button id="mainActionBtn" onclick="handleTranslate()" class="w-full h-16 py-4 rounded-[26px] bg-[#006D77] dark:bg-[#26A69A] text-white text-base font-black shadow-2xl shadow-teal-500/10 flex items-center justify-center gap-3 btn-press">
+            <span id="ui-btn-text">ترجمه کن</span>
+            <div id="loadingSpinner" class="hidden loader"></div>
+        </button>
 
-            <div class="fintech-card p-6 space-y-4">
-                <div class="relative group">
-                    <textarea id="sourceText" class="w-full min-h-[160px] text-xl outline-none resize-none placeholder:text-gray-300 bg-transparent" placeholder="متن را وارد کنید..."></textarea>
-                    <div class="absolute bottom-0 right-0 flex space-x-1 space-x-reverse p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="pasteText()" class="p-2 text-gray-400 hover:text-teal-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></button>
-                        <button onclick="clearInput()" class="p-2 text-gray-400 hover:text-red-400"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                    </div>
+        <!-- Result Card -->
+        <div id="resultCard" class="hidden glass-card p-8 bg-[#006D77]/5 dark:bg-[#26A69A]/5 border-[#006D77]/10 animate-pop">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <span id="ui-res-label" class="text-[10px] font-black uppercase text-[#006D77]/60 dark:text-[#26A69A]/60 tracking-wider">نتیجه نهایی</span>
+                    <span id="appliedToneTag" class="px-2 py-0.5 bg-[#FF8360]/10 text-[#FF8360] rounded-md text-[8px] font-black uppercase"></span>
                 </div>
-                <div class="flex justify-between items-center border-t dark:border-gray-800 pt-4">
-                    <div id="charCount" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">0 Characters</div>
-                    <button onclick="handleTranslate()" id="mainActionBtn" class="btn-teal px-10 py-4 rounded-2xl font-bold shadow-lg shadow-[#006D77]/20 flex items-center space-x-2 active:scale-95 transition-transform">
-                        <span id="ui-btn-text">ترجمه</span>
-                        <div id="loadingSpinner" class="hidden loader mr-2"></div>
-                    </button>
+                <button onclick="copyOutput()" class="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-black/5 active:scale-90 transition-all">
+                    <svg class="h-4 w-4 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                </button>
+            </div>
+            <p id="targetText" class="text-xl font-bold leading-relaxed dark:text-slate-100"></p>
+        </div>
+
+    </main>
+
+    <!-- Unified Modals -->
+    <div id="settingsModal" class="modal-container" onclick="closeModal('settings')">
+        <div class="modal-content p-8 space-y-8" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center">
+                <h2 id="ui-settings-title" class="text-lg font-black text-[#006D77] dark:text-[#26A69A]">تنظیمات</h2>
+                <button onclick="closeModal('settings')" class="text-slate-400 p-1 btn-press"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            
+            <div class="space-y-6 overflow-y-auto no-scroll flex-1">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center"><label id="ui-keys-label" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">API Keys</label><button onclick="addNewKeyField()" class="text-[9px] font-black text-teal-600">+ جدید</button></div>
+                    <div id="apiKeysList" class="space-y-2"></div>
+                </div>
+                <div class="space-y-3 pt-4 border-t dark:border-white/5">
+                    <label id="ui-tone-label" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">لحن ترجمه</label>
+                    <select id="toneSelector" class="w-full p-4 bg-slate-50 dark:bg-black/20 rounded-[20px] text-xs font-bold border-none outline-none dark:text-white"></select>
+                </div>
+                <div class="space-y-3 pt-4 border-t dark:border-white/5">
+                    <label id="ui-model-label" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">مدل هوش مصنوعی</label>
+                    <select id="modelSelector" class="w-full p-4 bg-slate-50 dark:bg-black/20 rounded-[20px] text-xs font-bold border-none outline-none dark:text-white"></select>
+                    <button onclick="fetchAvailableModels()" class="w-full py-3 bg-[#FF8360]/10 text-[#FF8360] rounded-2xl font-black text-[9px] tracking-widest uppercase">Update Models</button>
                 </div>
             </div>
-
-            <div id="resultCard" class="hidden fintech-card p-6 bg-[#006D77]/5 dark:bg-[#26A69A]/5 border-[#006D77]/10 animate-fade">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <span id="ui-res-label" class="text-[10px] font-bold uppercase tracking-widest text-[#006D77]/60">ترجمه نهایی</span>
-                        <span id="appliedToneTag" class="text-[9px] bg-[#FF8360]/10 text-[#FF8360] px-2 py-0.5 rounded-full font-bold"></span>
-                    </div>
-                    <button onclick="copyOutput()" class="p-2 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 shadow-sm"><svg class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg></button>
-                </div>
-                <p id="targetText" class="text-xl leading-relaxed font-semibold dark:text-gray-200"></p>
-            </div>
-        </main>
-
-        <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-gray-800 text-white px-8 py-3 rounded-2xl text-xs opacity-0 transition-all pointer-events-none font-bold"></div>
+            <button onclick="saveAllSettings()" id="ui-save-btn" class="w-full py-5 bg-[#006D77] dark:bg-[#26A69A] text-white rounded-[24px] font-black shadow-lg btn-press">ذخیره نهایی</button>
+        </div>
     </div>
 
-    <script>
-        // PWA Manifest Injection
-        const manifest = {
-            "name": "Smart Translator Ehsan Shamsi",
-            "short_name": "SmartTranslator",
-            "start_url": ".",
-            "display": "standalone",
-            "background_color": "#FDFBF7",
-            "theme_color": "#006D77",
-            "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(manifestBlob);
-        document.head.appendChild(link);
+    <div id="historyModal" class="modal-container" onclick="closeModal('history')">
+        <div class="modal-content p-8 space-y-6" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center">
+                <h2 id="ui-history-title" class="text-lg font-black text-[#006D77] dark:text-[#26A69A]">تاریخچه سوابق</h2>
+                <div class="flex gap-2">
+                    <button onclick="confirmClearHistory()" class="h-8 w-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 btn-press"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                    <button onclick="closeModal('history')" class="text-slate-400 p-1 btn-press"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+            </div>
+            <input type="text" id="historySearch" oninput="renderHistory()" placeholder="جستجو..." class="w-full p-4 bg-slate-50 dark:bg-black/20 rounded-[20px] text-xs border-none outline-none mb-2 dark:text-white">
+            <div id="historyList" class="flex-1 overflow-y-auto no-scroll space-y-4"></div>
+        </div>
+    </div>
 
+    <div id="confirmOverlay" class="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xl hidden flex items-center justify-center p-8">
+        <div class="glass-card max-w-xs w-full p-8 text-center animate-pop space-y-6">
+            <h3 id="confirm-q" class="text-base font-black">آیا مطمئن هستید؟</h3>
+            <div class="flex gap-3">
+                <button onclick="resolveConfirm(false)" class="flex-1 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 font-black text-[10px] uppercase">خیر</button>
+                <button onclick="resolveConfirm(true)" class="flex-1 py-3.5 rounded-xl bg-red-500 text-white font-black text-[10px] uppercase shadow-lg shadow-red-500/20">بله</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-full text-[9px] font-black shadow-2xl opacity-0 transition-all pointer-events-none translate-y-4"></div>
+
+    <script>
         const tones = [
-            { id: 'neutral', fa: 'خنثی', en: 'Neutral' }, { id: 'formal', fa: 'رسمی', en: 'Formal' },
-            { id: 'friendly', fa: 'دوستانه', en: 'Friendly' }, { id: 'poetic', fa: 'ادبی', en: 'Poetic' },
-            { id: 'slang', fa: 'عامیانه', en: 'Slang' }, { id: 'concise', fa: 'کوتاه', en: 'Short' },
-            { id: 'academic', fa: 'علمی', en: 'Academic' }, { id: 'professional', fa: 'تجاری', en: 'Business' }
+            { id: 'neutral', fa: 'خنثی و استاندارد', en: 'Neutral' }, { id: 'formal', fa: 'بسیار رسمی و اداری', en: 'Highly Formal' },
+            { id: 'literary', fa: 'ادبی و کتابی', en: 'Literary' }, { id: 'poetic', fa: 'شاعرانه و هنری', en: 'Poetic' },
+            { id: 'friendly', fa: 'دوستانه و صمیمی', en: 'Friendly' }, { id: 'professional', fa: 'حرفه‌ای و تجاری', en: 'Business' },
+            { id: 'slang', fa: 'عامیانه و خیابانی', en: 'Slang' }, { id: 'concise', fa: 'خلاصه و مفید', en: 'Concise' },
+            { id: 'academic', fa: 'آکادمیک و علمی', en: 'Academic' }, { id: 'legal', fa: 'حقوقی و قضایی', en: 'Legal' }
+        ];
+
+        const languages = [
+            { id: 'Persian', fa: 'Persian (فارسی)', en: 'Persian' }, { id: 'English', fa: 'English (انگلیسی)', en: 'English' },
+            { id: 'Arabic', fa: 'Arabic (عربی)', en: 'Arabic' }, { id: 'German', fa: 'German (آلمانی)', en: 'German' },
+            { id: 'French', fa: 'French (فرانسوی)', en: 'French' }, { id: 'Spanish', fa: 'Spanish (اسپانیایی)', en: 'Spanish' },
+            { id: 'Russian', fa: 'Russian (روسی)', en: 'Russian' }, { id: 'Turkish', fa: 'Turkish (ترکی)', en: 'Turkish' },
+            { id: 'Japanese', fa: 'Japanese (ژاپنی)', en: 'Japanese' }, { id: 'Chinese', fa: 'Chinese (چینی)', en: 'Chinese' },
+            { id: 'Korean', fa: 'Korean (کره‌ای)', en: 'Korean' }, { id: 'Italian', fa: 'Italian (ایتالیایی)', en: 'Italian' }
         ];
 
         const ui = {
-            fa: { p1: 'مترجم', p2: 'هوشمند', author: 'ساخته شده توسط احسان شمسی', btn: 'ترجمه', auto: 'تشخیص خودکار', res: 'ترجمه نهایی', settings: 'تنظیمات', keys: 'کلیدهای API', tone: 'لحن ترجمه', model: 'مدل هوش مصنوعی', save: 'ذخیره نهایی', history: 'تاریخچه', lang: 'EN', copied: 'کپی شد', confirmQ: 'آیا مطمئن هستید؟' },
-            en: { p1: 'Smart', p2: 'Translator', author: 'By Ehsan Shamsi', btn: 'Translate', auto: 'Auto Detect', res: 'Translation', settings: 'Settings', keys: 'API Keys', tone: 'Translation Tone', model: 'AI Model', save: 'Save All', history: 'History', lang: 'FA', copied: 'Copied', confirmQ: 'Are you sure?' }
+            fa: { btn: 'ترجمه کن', auto: 'تشخیص خودکار', res: 'نتیجه نهایی', settings: 'تنظیمات', keys: 'کلیدهای API', tone: 'لحن ترجمه', model: 'مدل هوش مصنوعی', save: 'ذخیره نهایی', history: 'تاریخچه سوابق', lang: 'EN', copied: 'کپی شد!', confirmQ: 'آیا مطمئن هستید؟' },
+            en: { btn: 'Translate Now', auto: 'Auto Detect', res: 'Final Result', settings: 'App Settings', keys: 'API Keys', tone: 'Translation Tone', model: 'AI Model Selection', save: 'Save All Changes', history: 'History', lang: 'FA', copied: 'Copied!', confirmQ: 'Are you sure?' }
         };
 
-        let config = {
-            apiKeys: [], models: [], selectedModel: 'gemini-1.5-flash',
-            selectedTone: 'neutral', targetLang: 'Persian', uiLang: 'fa',
-            theme: 'light', history: [], currentIndex: 0
-        };
-
+        let config = { apiKeys: [], models: [], selectedModel: 'gemini-1.5-flash', selectedTone: 'neutral', targetLang: 'Persian', uiLang: 'fa', theme: 'light', history: [], currentIndex: 0 };
         let confirmResolver = null;
 
         window.onload = () => {
-            const saved = localStorage.getItem('ehsan_shams_pwa_final_v1');
-            if (saved) config = JSON.parse(saved);
-            else addNewKeyField();
-
-            applyTheme(); renderApiKeys(); updateModelSelect(); populateTones(); applyUILanguage();
+            const saved = localStorage.getItem('ehsan_shamsi_v15_cfg');
+            if (saved) config = JSON.parse(saved); else addNewKeyField();
+            applyTheme(); applyUILanguage(); renderApiKeys(); updateModelSelect(); populateTones(); populateLangs();
             document.getElementById('targetLang').value = config.targetLang;
-            document.getElementById('sourceText').addEventListener('input', e => {
-                document.getElementById('charCount').innerText = `${e.target.value.length} Characters`;
-            });
-            
-            // Fix PWA Standalone Zooming issues
+            document.getElementById('sourceText').addEventListener('input', e => document.getElementById('charCount').innerText = `${e.target.value.length} CHARS`);
             document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         };
 
-        function save() { localStorage.setItem('ehsan_shams_pwa_final_v1', JSON.stringify(config)); }
-
-        function toggleTheme() {
-            config.theme = config.theme === 'light' ? 'dark' : 'light';
-            applyTheme(); save();
-        }
-
+        function save() { localStorage.setItem('ehsan_shamsi_v15_cfg', JSON.stringify(config)); }
+        function toggleTheme() { config.theme = config.theme === 'light' ? 'dark' : 'light'; applyTheme(); save(); }
         function applyTheme() {
-            const html = document.getElementById('htmlTag');
-            if (config.theme === 'dark') html.classList.add('dark');
-            else html.classList.remove('dark');
+            const h = document.getElementById('htmlTag');
+            const icon = document.getElementById('theme-icon');
+            if (config.theme === 'dark') { h.classList.add('dark'); icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />'; }
+            else { h.classList.remove('dark'); icon.innerHTML = '<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />'; }
         }
 
-        function toggleUILanguage() {
-            config.uiLang = config.uiLang === 'fa' ? 'en' : 'fa';
-            applyUILanguage(); populateTones(); save();
-        }
-
+        function toggleUILanguage() { config.uiLang = config.uiLang === 'fa' ? 'en' : 'fa'; applyUILanguage(); populateTones(); populateLangs(); save(); }
         function applyUILanguage() {
             const t = ui[config.uiLang];
             const isFa = config.uiLang === 'fa';
             document.getElementById('htmlTag').dir = isFa ? 'rtl' : 'ltr';
-            document.getElementById('ui-title-p1').innerText = t.p1;
-            document.getElementById('ui-title-p2').innerText = t.p2;
-            document.getElementById('ui-author').innerText = t.author;
             document.getElementById('ui-lang-btn').innerText = t.lang;
             document.getElementById('ui-btn-text').innerText = t.btn;
             document.getElementById('ui-auto').innerText = t.auto;
@@ -330,19 +332,21 @@
             document.getElementById('ui-tone-label').innerText = t.tone;
             document.getElementById('ui-model-label').innerText = t.model;
             document.getElementById('ui-save-btn').innerText = t.save;
-            document.getElementById('dir-arrow').style.transform = isFa ? 'rotate(0deg)' : 'rotate(180deg)';
+            document.getElementById('confirm-q').innerText = t.confirmQ;
         }
 
-        function toggleSettings() { document.getElementById('settingsOverlay').classList.toggle('hidden'); }
-        function toggleHistory() { document.getElementById('historyOverlay').classList.toggle('hidden'); renderHistory(); }
-        function handleOverlayClick(e, id) { if (e.target.id === id) document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) { 
+            const m = document.getElementById(id + 'Modal'); m.style.display = 'flex';
+            if (id === 'history') renderHistory();
+        }
+        function closeModal(id) { document.getElementById(id + 'Modal').style.display = 'none'; }
 
         async function handleTranslate() {
             const text = document.getElementById('sourceText').value.trim();
             const target = document.getElementById('targetLang').value;
-            if (!text) { showToast('Text Required'); return; }
-            if (config.apiKeys.length === 0) { toggleSettings(); return; }
-
+            if (!text) return showToast('Empty Text');
+            if (config.apiKeys.length === 0) return openModal('settings');
+            
             const btn = document.getElementById('mainActionBtn');
             const spinner = document.getElementById('loadingSpinner');
             btn.disabled = true; spinner.classList.remove('hidden');
@@ -353,39 +357,39 @@
                 document.getElementById('targetText').innerText = result;
                 document.getElementById('appliedToneTag').innerText = tones.find(t => t.id === config.selectedTone)[config.uiLang];
                 document.getElementById('resultCard').classList.remove('hidden');
-                config.history.push({ id: Date.now().toString(), source: text, target: result, targetLang: target });
+                config.history.push({ id: Date.now().toString(), source: text, target: result, targetLang: target, date: new Date().toLocaleTimeString() });
                 if (config.history.length > 50) config.history.shift();
                 save();
             } catch (err) { showToast(err.message); } finally { btn.disabled = false; spinner.classList.add('hidden'); }
         }
 
         async function callGemini(text, target, tone, attempts = 0) {
-            if (attempts >= config.apiKeys.length * 2) throw new Error('API Limit');
-            const key = config.apiKeys[config.currentIndex];
+            if (attempts >= config.apiKeys.length * 2) throw new Error('API Quota Reached');
+            const key = config.apiKeys[config.currentIndex % config.apiKeys.length];
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.selectedModel}:generateContent?key=${key}`;
-            const prompt = `Translate to ${target} in ${tone} style. ONLY output translation. Text: ${text}`;
+            const prompt = `Translate to ${target}. Tone: ${tone}. Instructions: Only output the translation. Text: ${text}`;
             try {
-                const r = await fetch(url, { method: 'POST', body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                if (r.status === 429) { config.currentIndex = (config.currentIndex + 1) % config.apiKeys.length; return callGemini(text, target, tone, attempts + 1); }
+                const r = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                if (r.status === 429) { config.currentIndex++; return callGemini(text, target, tone, attempts + 1); }
                 const d = await r.json(); return d.candidates[0].content.parts[0].text.trim();
-            } catch (e) { config.currentIndex = (config.currentIndex + 1) % config.apiKeys.length; return callGemini(text, target, tone, attempts + 1); }
+            } catch (e) { config.currentIndex++; return callGemini(text, target, tone, attempts + 1); }
         }
 
         function renderHistory() {
             const list = document.getElementById('historyList');
             const s = document.getElementById('historySearch').value.toLowerCase();
             const filtered = config.history.filter(h => h.source.toLowerCase().includes(s) || h.target.toLowerCase().includes(s));
-            list.innerHTML = filtered.reverse().map(h => `
-                <div class="fintech-card p-4 space-y-2 relative group history-item">
+            list.innerHTML = filtered.slice().reverse().map(h => `
+                <div class="p-5 bg-slate-50 dark:bg-black/40 rounded-[24px] border border-black/5 space-y-3 relative group">
                     <div class="flex justify-between items-center">
-                        <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded">${h.targetLang}</span>
-                        <div class="flex space-x-1 space-x-reverse">
-                            <button onclick="restoreHistory('${h.id}')" class="p-1.5 text-teal-500 hover:bg-teal-50 rounded"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
-                            <button onclick="confirmDeleteHistory('${h.id}')" class="p-1.5 text-red-400 hover:bg-red-50 rounded"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                        <span class="text-[8px] font-black text-teal-600 uppercase">${h.targetLang} • ${h.date}</span>
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="restoreHistory('${h.id}')" class="p-1.5 text-teal-500"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                            <button onclick="confirmDeleteHistory('${h.id}')" class="p-1.5 text-red-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-400 truncate">${h.source}</p>
-                    <p class="text-sm font-bold dark:text-gray-200">${h.target}</p>
+                    <p class="text-[10px] text-slate-400 truncate">${h.source}</p>
+                    <p class="text-xs font-bold dark:text-slate-100">${h.target}</p>
                 </div>
             `).join('');
         }
@@ -397,49 +401,54 @@
                 document.getElementById('targetText').innerText = h.target;
                 document.getElementById('targetLang').value = h.targetLang;
                 document.getElementById('resultCard').classList.remove('hidden');
-                toggleHistory();
+                closeModal('history');
             }
         }
 
-        async function askConfirm(msg) {
-            document.getElementById('confirm-m').innerText = msg;
-            document.getElementById('confirmOverlay').classList.remove('hidden');
-            return new Promise(res => { confirmResolver = res; });
-        }
+        async function askConfirm() { document.getElementById('confirmOverlay').classList.remove('hidden'); return new Promise(res => { confirmResolver = res; }); }
         function resolveConfirm(val) { document.getElementById('confirmOverlay').classList.add('hidden'); if (confirmResolver) confirmResolver(val); }
-        async function confirmClearHistory() { if (await askConfirm('آیا کل تاریخچه پاک شود؟')) { config.history = []; save(); renderHistory(); } }
-        async function confirmDeleteHistory(id) { if (await askConfirm('این مورد حذف شود؟')) { config.history = config.history.filter(h => h.id !== id); save(); renderHistory(); } }
+        async function confirmClearHistory() { if (await askConfirm()) { config.history = []; save(); renderHistory(); } }
+        async function confirmDeleteHistory(id) { if (await askConfirm()) { config.history = config.history.filter(h => h.id !== id); save(); renderHistory(); } }
 
-        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2500); }
+        function showToast(m) {
+            const t = document.getElementById('toast'); t.innerText = m;
+            t.classList.remove('opacity-0', 'translate-y-4'); t.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => { t.classList.remove('opacity-100', 'translate-y-0'); t.classList.add('opacity-0', 'translate-y-4'); }, 2500);
+        }
+
         function addNewKeyField(v = '') {
-            const container = document.getElementById('apiKeysList');
             const id = Date.now() + Math.random();
             const div = document.createElement('div');
-            div.className = 'flex space-x-2 space-x-reverse';
-            div.id = `k-${id}`;
-            div.innerHTML = `<input type="password" class="key-input w-full p-3 input-field rounded-xl text-xs" value="${v}"><button onclick="document.getElementById('k-${id}').remove()" class="p-3 text-red-400">×</button>`;
-            container.appendChild(div);
+            div.id = `k-${id}`; div.className = 'flex gap-2';
+            div.innerHTML = `<input type="password" class="flex-1 p-3 rounded-xl bg-slate-100 dark:bg-black/60 font-mono text-[10px] outline-none border-none dark:text-white" value="${v}"><button onclick="document.getElementById('k-${id}').remove()" class="h-10 w-10 text-red-500 font-bold">×</button>`;
+            document.getElementById('apiKeysList').appendChild(div);
         }
-        function renderApiKeys() { const c = document.getElementById('apiKeysList'); c.innerHTML = ''; config.apiKeys.forEach(k => addNewKeyField(k)); }
+
+        function renderApiKeys() { document.getElementById('apiKeysList').innerHTML = ''; config.apiKeys.forEach(k => addNewKeyField(k)); }
+        function populateTones() { document.getElementById('toneSelector').innerHTML = tones.map(t => `<option value="${t.id}" ${t.id === config.selectedTone ? 'selected' : ''}>${config.uiLang === 'fa' ? t.fa : t.en}</option>`).join(''); }
+        function populateLangs() { document.getElementById('targetLang').innerHTML = languages.map(l => `<option value="${l.id}">${config.uiLang === 'fa' ? l.fa : l.en}</option>`).join(''); }
         function updateModelSelect() { document.getElementById('modelSelector').innerHTML = config.models.map(m => `<option value="${m.name}" ${m.name === config.selectedModel ? 'selected' : ''}>${m.displayName}</option>`).join(''); }
-        function populateTones() { document.getElementById('toneSelector').innerHTML = tones.map(t => `<option value="${t.id}" ${t.id === config.selectedTone ? 'selected' : ''}>${t[config.uiLang]}</option>`).join(''); }
-        function saveAllSettings() {
-            config.apiKeys = Array.from(document.querySelectorAll('.key-input')).map(i => i.value.trim()).filter(v => v);
-            config.selectedModel = document.getElementById('modelSelector').value;
-            config.selectedTone = document.getElementById('toneSelector').value;
-            save(); updateBadge(); toggleSettings(); showToast('Saved');
-        }
-        function updateBadge() { document.getElementById('keyBadge').innerText = config.apiKeys.length; }
+        
         async function fetchAvailableModels() {
-            if (config.apiKeys.length === 0) return;
+            const keys = Array.from(document.querySelectorAll('#apiKeysList input')).map(i => i.value.trim()).filter(v => v);
+            if (keys.length === 0) return showToast('No keys');
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${config.apiKeys[0]}`);
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys[0]}`);
                 const d = await r.json();
                 config.models = d.models.filter(m => m.supportedGenerationMethods.includes('generateContent')).map(m => ({ name: m.name.replace('models/', ''), displayName: m.displayName }));
-                updateModelSelect(); showToast('Models Updated');
-            } catch(e) { showToast('Error'); }
+                updateModelSelect(); showToast('Updated');
+            } catch(e) { showToast('Sync Error'); }
         }
-        function pasteText() { navigator.clipboard.readText().then(t => document.getElementById('sourceText').value = t); }
+
+        function saveAllSettings() {
+            config.apiKeys = Array.from(document.querySelectorAll('#apiKeysList input')).map(i => i.value.trim()).filter(v => v);
+            config.selectedModel = document.getElementById('modelSelector').value;
+            config.selectedTone = document.getElementById('toneSelector').value;
+            config.targetLang = document.getElementById('targetLang').value;
+            save(); document.getElementById('keyBadge').innerText = config.apiKeys.length; closeModal('settings'); showToast('Saved');
+        }
+
+        function pasteText() { navigator.clipboard.readText().then(t => { document.getElementById('sourceText').value = t; document.getElementById('charCount').innerText = `${t.length} CHARS`; }); }
         function clearInput() { document.getElementById('sourceText').value = ''; }
         function copyOutput() { navigator.clipboard.writeText(document.getElementById('targetText').innerText); showToast(ui[config.uiLang].copied); }
     </script>
