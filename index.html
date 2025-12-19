@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html id="htmlTag" lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA Basic Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Smart Translator">
+    <meta name="theme-color" content="#FDFBF7">
+    
+    <!-- Icon Reference (Assuming icon.png exists in the same folder) -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <title>Smart Translator | Ehsan Shamsi</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-cream: #FDFBF7;
+            --primary-teal: #006D77;
+            --accent-coral: #FF8360;
+            --text-dark: #2D3142;
+            --card-bg: #FFFFFF;
+        }
+
+        .dark {
+            --bg-cream: #121418;
+            --primary-teal: #26A69A;
+            --accent-coral: #FF8A65;
+            --text-dark: #E0E0E0;
+            --card-bg: #1E2128;
+        }
+
+        body {
+            font-family: 'Inter', 'Tahoma', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            /* Disable Zoom and Selection on UI elements */
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .fintech-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 109, 119, 0.05);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-teal { background-color: var(--primary-teal); color: white; }
+        .btn-coral { background-color: var(--accent-coral); color: white; }
+        
+        .input-field {
+            background-color: rgba(0,0,0,0.02);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            color: var(--text-dark);
+            user-select: text;
+        }
+        .dark .input-field { background-color: rgba(255,255,255,0.03); }
+        .input-field:focus {
+            border-color: var(--primary-teal);
+            background-color: var(--card-bg);
+            outline: none;
+        }
+
+        textarea, p { user-select: text !important; }
+
+        .loader {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+
+        .lang-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 109, 119, 0.1);
+        }
+
+        /* Webkit specific to hide scrollbars */
+        .custom-scrollbar::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8 min-h-screen pb-20">
+
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col items-center mb-8 animate-fade">
+            <div class="flex justify-between items-center w-full mb-4">
+                <div class="flex flex-col">
+                    <h1 class="text-2xl font-extrabold tracking-tight">
+                        <span class="text-[#006D77] dark:text-[#26A69A]" id="ui-title-p1">مترجم</span>
+                        <span class="text-[#FF8360]" id="ui-title-p2">هوشمند</span>
+                    </h1>
+                    <span id="ui-author" class="text-[10px] text-gray-400 font-medium opacity-80">ساخته شده توسط احسان شمسی</span>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button onclick="toggleTheme()" class="p-2 fintech-card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <svg id="theme-icon" class="h-5 w-5 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                    <button onclick="toggleHistory()" class="p-2 fintech-card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <svg class="h-5 w-5 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <button onclick="toggleUILanguage()" class="p-2 fintech-card hover:bg-gray-50 text-xs font-bold text-[#006D77] dark:text-[#26A69A] px-3">
+                        <span id="ui-lang-btn">EN</span>
+                    </button>
+                    <button onclick="toggleSettings()" class="p-2 fintech-card hover:scale-105 transition-transform relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#006D77] dark:text-[#26A69A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        <span id="keyBadge" class="absolute -top-1 -right-1 bg-[#FF8360] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Modals -->
+        <div id="settingsOverlay" onclick="handleOverlayClick(event, 'settingsOverlay')" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="fintech-card w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-fade">
+                <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center">
+                    <h2 id="ui-settings-title" class="text-xl font-bold text-[#006D77] dark:text-[#26A69A]">تنظیمات</h2>
+                    <button onclick="toggleSettings()" class="text-gray-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+                <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-sm font-bold text-gray-500"><label id="ui-keys-label">کلیدهای API</label><button onclick="addNewKeyField()" class="btn-teal px-3 py-1 rounded-full text-[10px]">+ جدید</button></div>
+                        <div id="apiKeysList" class="space-y-3"></div>
+                    </div>
+                    <div class="space-y-4 pt-4 border-t dark:border-gray-800">
+                        <label id="ui-tone-label" class="text-sm font-bold text-gray-500">لحن ترجمه</label>
+                        <select id="toneSelector" class="w-full p-3 input-field rounded-xl text-sm font-medium"></select>
+                    </div>
+                    <div class="space-y-4 pt-4 border-t dark:border-gray-800">
+                        <label id="ui-model-label" class="text-sm font-bold text-gray-500">مدل هوش مصنوعی</label>
+                        <select id="modelSelector" class="w-full p-3 input-field rounded-xl text-sm font-medium"></select>
+                        <button onclick="fetchAvailableModels()" class="w-full py-2 btn-coral rounded-xl text-[10px] font-bold uppercase">بروزرسانی مدل‌ها</button>
+                    </div>
+                </div>
+                <div class="p-6 border-t dark:border-gray-800 bg-gray-50/20"><button onclick="saveAllSettings()" id="ui-save-btn" class="w-full py-4 btn-teal rounded-2xl font-bold">ذخیره نهایی</button></div>
+            </div>
+        </div>
+
+        <div id="historyOverlay" onclick="handleOverlayClick(event, 'historyOverlay')" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="fintech-card w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col animate-fade">
+                <div class="p-6 border-b dark:border-gray-800 flex justify-between items-center">
+                    <h2 id="ui-history-title" class="text-xl font-bold text-[#006D77] dark:text-[#26A69A]">تاریخچه</h2>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button onclick="confirmClearHistory()" class="p-2 text-red-400 hover:bg-red-50 rounded-lg"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                        <button onclick="toggleHistory()" class="text-gray-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50/30 dark:bg-gray-900/10"><input type="text" id="historySearch" oninput="renderHistory()" placeholder="جستجو..." class="w-full p-3 input-field rounded-xl text-sm"></div>
+                <div id="historyList" class="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1"></div>
+            </div>
+        </div>
+
+        <!-- Confirm Dialog -->
+        <div id="confirmOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-6">
+            <div class="fintech-card w-full max-w-sm p-8 space-y-6 animate-fade text-center">
+                <h3 class="text-xl font-bold mb-2 dark:text-white" id="confirm-q">آیا مطمئن هستید؟</h3>
+                <p class="text-sm text-gray-400" id="confirm-m">این عمل قابل بازگشت نیست.</p>
+                <div class="flex space-x-3 space-x-reverse">
+                    <button onclick="resolveConfirm(false)" class="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 font-bold">خیر</button>
+                    <button onclick="resolveConfirm(true)" class="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold">بله</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Body -->
+        <main class="space-y-6 animate-fade">
+            <div class="fintech-card p-4 flex items-center justify-between">
+                <div id="ui-auto" class="flex-1 text-center font-bold text-gray-400 text-sm">تشخیص خودکار</div>
+                <div class="px-4">
+                    <div class="lang-divider">
+                        <svg id="dir-arrow" class="h-5 w-5 text-[#FF8360] transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </div>
+                </div>
+                <select id="targetLang" class="flex-1 bg-transparent text-center font-bold text-[#006D77] dark:text-[#26A69A] outline-none border-none cursor-pointer">
+                    <option value="Persian">فارسی</option><option value="English">انگلیسی</option><option value="Arabic">عربی</option>
+                    <option value="German">آلمانی</option><option value="French">فرانسوی</option><option value="Spanish">اسپانیایی</option>
+                    <option value="Turkish">ترکی</option><option value="Italian">ایتالیایی</option><option value="Russian">روسی</option>
+                </select>
+            </div>
+
+            <div class="fintech-card p-6 space-y-4">
+                <div class="relative group">
+                    <textarea id="sourceText" class="w-full min-h-[160px] text-xl outline-none resize-none placeholder:text-gray-300 bg-transparent" placeholder="متن را وارد کنید..."></textarea>
+                    <div class="absolute bottom-0 right-0 flex space-x-1 space-x-reverse p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="pasteText()" class="p-2 text-gray-400 hover:text-teal-500"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></button>
+                        <button onclick="clearInput()" class="p-2 text-gray-400 hover:text-red-400"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center border-t dark:border-gray-800 pt-4">
+                    <div id="charCount" class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">0 Characters</div>
+                    <button onclick="handleTranslate()" id="mainActionBtn" class="btn-teal px-10 py-4 rounded-2xl font-bold shadow-lg shadow-[#006D77]/20 flex items-center space-x-2 active:scale-95 transition-transform">
+                        <span id="ui-btn-text">ترجمه</span>
+                        <div id="loadingSpinner" class="hidden loader mr-2"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="resultCard" class="hidden fintech-card p-6 bg-[#006D77]/5 dark:bg-[#26A69A]/5 border-[#006D77]/10 animate-fade">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <span id="ui-res-label" class="text-[10px] font-bold uppercase tracking-widest text-[#006D77]/60">ترجمه نهایی</span>
+                        <span id="appliedToneTag" class="text-[9px] bg-[#FF8360]/10 text-[#FF8360] px-2 py-0.5 rounded-full font-bold"></span>
+                    </div>
+                    <button onclick="copyOutput()" class="p-2 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 shadow-sm"><svg class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg></button>
+                </div>
+                <p id="targetText" class="text-xl leading-relaxed font-semibold dark:text-gray-200"></p>
+            </div>
+        </main>
+
+        <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-gray-800 text-white px-8 py-3 rounded-2xl text-xs opacity-0 transition-all pointer-events-none font-bold"></div>
+    </div>
+
+    <script>
+        // PWA Manifest Injection
+        const manifest = {
+            "name": "Smart Translator Ehsan Shamsi",
+            "short_name": "SmartTranslator",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#FDFBF7",
+            "theme_color": "#006D77",
+            "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(link);
+
+        const tones = [
+            { id: 'neutral', fa: 'خنثی', en: 'Neutral' }, { id: 'formal', fa: 'رسمی', en: 'Formal' },
+            { id: 'friendly', fa: 'دوستانه', en: 'Friendly' }, { id: 'poetic', fa: 'ادبی', en: 'Poetic' },
+            { id: 'slang', fa: 'عامیانه', en: 'Slang' }, { id: 'concise', fa: 'کوتاه', en: 'Short' },
+            { id: 'academic', fa: 'علمی', en: 'Academic' }, { id: 'professional', fa: 'تجاری', en: 'Business' }
+        ];
+
+        const ui = {
+            fa: { p1: 'مترجم', p2: 'هوشمند', author: 'ساخته شده توسط احسان شمسی', btn: 'ترجمه', auto: 'تشخیص خودکار', res: 'ترجمه نهایی', settings: 'تنظیمات', keys: 'کلیدهای API', tone: 'لحن ترجمه', model: 'مدل هوش مصنوعی', save: 'ذخیره نهایی', history: 'تاریخچه', lang: 'EN', copied: 'کپی شد', confirmQ: 'آیا مطمئن هستید؟' },
+            en: { p1: 'Smart', p2: 'Translator', author: 'By Ehsan Shamsi', btn: 'Translate', auto: 'Auto Detect', res: 'Translation', settings: 'Settings', keys: 'API Keys', tone: 'Translation Tone', model: 'AI Model', save: 'Save All', history: 'History', lang: 'FA', copied: 'Copied', confirmQ: 'Are you sure?' }
+        };
+
+        let config = {
+            apiKeys: [], models: [], selectedModel: 'gemini-1.5-flash',
+            selectedTone: 'neutral', targetLang: 'Persian', uiLang: 'fa',
+            theme: 'light', history: [], currentIndex: 0
+        };
+
+        let confirmResolver = null;
+
+        window.onload = () => {
+            const saved = localStorage.getItem('ehsan_shams_pwa_final_v1');
+            if (saved) config = JSON.parse(saved);
+            else addNewKeyField();
+
+            applyTheme(); renderApiKeys(); updateModelSelect(); populateTones(); applyUILanguage();
+            document.getElementById('targetLang').value = config.targetLang;
+            document.getElementById('sourceText').addEventListener('input', e => {
+                document.getElementById('charCount').innerText = `${e.target.value.length} Characters`;
+            });
+            
+            // Fix PWA Standalone Zooming issues
+            document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        };
+
+        function save() { localStorage.setItem('ehsan_shams_pwa_final_v1', JSON.stringify(config)); }
+
+        function toggleTheme() {
+            config.theme = config.theme === 'light' ? 'dark' : 'light';
+            applyTheme(); save();
+        }
+
+        function applyTheme() {
+            const html = document.getElementById('htmlTag');
+            if (config.theme === 'dark') html.classList.add('dark');
+            else html.classList.remove('dark');
+        }
+
+        function toggleUILanguage() {
+            config.uiLang = config.uiLang === 'fa' ? 'en' : 'fa';
+            applyUILanguage(); populateTones(); save();
+        }
+
+        function applyUILanguage() {
+            const t = ui[config.uiLang];
+            const isFa = config.uiLang === 'fa';
+            document.getElementById('htmlTag').dir = isFa ? 'rtl' : 'ltr';
+            document.getElementById('ui-title-p1').innerText = t.p1;
+            document.getElementById('ui-title-p2').innerText = t.p2;
+            document.getElementById('ui-author').innerText = t.author;
+            document.getElementById('ui-lang-btn').innerText = t.lang;
+            document.getElementById('ui-btn-text').innerText = t.btn;
+            document.getElementById('ui-auto').innerText = t.auto;
+            document.getElementById('ui-res-label').innerText = t.res;
+            document.getElementById('ui-settings-title').innerText = t.settings;
+            document.getElementById('ui-history-title').innerText = t.history;
+            document.getElementById('ui-keys-label').innerText = t.keys;
+            document.getElementById('ui-tone-label').innerText = t.tone;
+            document.getElementById('ui-model-label').innerText = t.model;
+            document.getElementById('ui-save-btn').innerText = t.save;
+            document.getElementById('dir-arrow').style.transform = isFa ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function toggleSettings() { document.getElementById('settingsOverlay').classList.toggle('hidden'); }
+        function toggleHistory() { document.getElementById('historyOverlay').classList.toggle('hidden'); renderHistory(); }
+        function handleOverlayClick(e, id) { if (e.target.id === id) document.getElementById(id).classList.add('hidden'); }
+
+        async function handleTranslate() {
+            const text = document.getElementById('sourceText').value.trim();
+            const target = document.getElementById('targetLang').value;
+            if (!text) { showToast('Text Required'); return; }
+            if (config.apiKeys.length === 0) { toggleSettings(); return; }
+
+            const btn = document.getElementById('mainActionBtn');
+            const spinner = document.getElementById('loadingSpinner');
+            btn.disabled = true; spinner.classList.remove('hidden');
+
+            try {
+                const tone = tones.find(t => t.id === config.selectedTone).en;
+                const result = await callGemini(text, target, tone);
+                document.getElementById('targetText').innerText = result;
+                document.getElementById('appliedToneTag').innerText = tones.find(t => t.id === config.selectedTone)[config.uiLang];
+                document.getElementById('resultCard').classList.remove('hidden');
+                config.history.push({ id: Date.now().toString(), source: text, target: result, targetLang: target });
+                if (config.history.length > 50) config.history.shift();
+                save();
+            } catch (err) { showToast(err.message); } finally { btn.disabled = false; spinner.classList.add('hidden'); }
+        }
+
+        async function callGemini(text, target, tone, attempts = 0) {
+            if (attempts >= config.apiKeys.length * 2) throw new Error('API Limit');
+            const key = config.apiKeys[config.currentIndex];
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.selectedModel}:generateContent?key=${key}`;
+            const prompt = `Translate to ${target} in ${tone} style. ONLY output translation. Text: ${text}`;
+            try {
+                const r = await fetch(url, { method: 'POST', body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                if (r.status === 429) { config.currentIndex = (config.currentIndex + 1) % config.apiKeys.length; return callGemini(text, target, tone, attempts + 1); }
+                const d = await r.json(); return d.candidates[0].content.parts[0].text.trim();
+            } catch (e) { config.currentIndex = (config.currentIndex + 1) % config.apiKeys.length; return callGemini(text, target, tone, attempts + 1); }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const s = document.getElementById('historySearch').value.toLowerCase();
+            const filtered = config.history.filter(h => h.source.toLowerCase().includes(s) || h.target.toLowerCase().includes(s));
+            list.innerHTML = filtered.reverse().map(h => `
+                <div class="fintech-card p-4 space-y-2 relative group history-item">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded">${h.targetLang}</span>
+                        <div class="flex space-x-1 space-x-reverse">
+                            <button onclick="restoreHistory('${h.id}')" class="p-1.5 text-teal-500 hover:bg-teal-50 rounded"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></button>
+                            <button onclick="confirmDeleteHistory('${h.id}')" class="p-1.5 text-red-400 hover:bg-red-50 rounded"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 truncate">${h.source}</p>
+                    <p class="text-sm font-bold dark:text-gray-200">${h.target}</p>
+                </div>
+            `).join('');
+        }
+
+        function restoreHistory(id) {
+            const h = config.history.find(x => x.id === id);
+            if (h) {
+                document.getElementById('sourceText').value = h.source;
+                document.getElementById('targetText').innerText = h.target;
+                document.getElementById('targetLang').value = h.targetLang;
+                document.getElementById('resultCard').classList.remove('hidden');
+                toggleHistory();
+            }
+        }
+
+        async function askConfirm(msg) {
+            document.getElementById('confirm-m').innerText = msg;
+            document.getElementById('confirmOverlay').classList.remove('hidden');
+            return new Promise(res => { confirmResolver = res; });
+        }
+        function resolveConfirm(val) { document.getElementById('confirmOverlay').classList.add('hidden'); if (confirmResolver) confirmResolver(val); }
+        async function confirmClearHistory() { if (await askConfirm('آیا کل تاریخچه پاک شود؟')) { config.history = []; save(); renderHistory(); } }
+        async function confirmDeleteHistory(id) { if (await askConfirm('این مورد حذف شود؟')) { config.history = config.history.filter(h => h.id !== id); save(); renderHistory(); } }
+
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2500); }
+        function addNewKeyField(v = '') {
+            const container = document.getElementById('apiKeysList');
+            const id = Date.now() + Math.random();
+            const div = document.createElement('div');
+            div.className = 'flex space-x-2 space-x-reverse';
+            div.id = `k-${id}`;
+            div.innerHTML = `<input type="password" class="key-input w-full p-3 input-field rounded-xl text-xs" value="${v}"><button onclick="document.getElementById('k-${id}').remove()" class="p-3 text-red-400">×</button>`;
+            container.appendChild(div);
+        }
+        function renderApiKeys() { const c = document.getElementById('apiKeysList'); c.innerHTML = ''; config.apiKeys.forEach(k => addNewKeyField(k)); }
+        function updateModelSelect() { document.getElementById('modelSelector').innerHTML = config.models.map(m => `<option value="${m.name}" ${m.name === config.selectedModel ? 'selected' : ''}>${m.displayName}</option>`).join(''); }
+        function populateTones() { document.getElementById('toneSelector').innerHTML = tones.map(t => `<option value="${t.id}" ${t.id === config.selectedTone ? 'selected' : ''}>${t[config.uiLang]}</option>`).join(''); }
+        function saveAllSettings() {
+            config.apiKeys = Array.from(document.querySelectorAll('.key-input')).map(i => i.value.trim()).filter(v => v);
+            config.selectedModel = document.getElementById('modelSelector').value;
+            config.selectedTone = document.getElementById('toneSelector').value;
+            save(); updateBadge(); toggleSettings(); showToast('Saved');
+        }
+        function updateBadge() { document.getElementById('keyBadge').innerText = config.apiKeys.length; }
+        async function fetchAvailableModels() {
+            if (config.apiKeys.length === 0) return;
+            try {
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${config.apiKeys[0]}`);
+                const d = await r.json();
+                config.models = d.models.filter(m => m.supportedGenerationMethods.includes('generateContent')).map(m => ({ name: m.name.replace('models/', ''), displayName: m.displayName }));
+                updateModelSelect(); showToast('Models Updated');
+            } catch(e) { showToast('Error'); }
+        }
+        function pasteText() { navigator.clipboard.readText().then(t => document.getElementById('sourceText').value = t); }
+        function clearInput() { document.getElementById('sourceText').value = ''; }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('targetText').innerText); showToast(ui[config.uiLang].copied); }
+    </script>
+</body>
+</html>
+
